@@ -18,7 +18,7 @@ pipeline {
         PREVIEW_NAMESPACE = "$APP_NAME-$BRANCH_NAME".toLowerCase()
         HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
       }
-      steps {
+      // steps {
       //   container('maven') {
       //     sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
       //     sh "mvn install"
@@ -30,7 +30,7 @@ pipeline {
       //       sh "jx preview --app $APP_NAME --dir ../.."
       //     }
       //   }
-      }
+      // }
     }
     stage('Build Release') {
       when {
