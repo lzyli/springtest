@@ -31,7 +31,6 @@ pipeline {
           }
         }
       }
-    }
     stage('Build Release') {
       when {
         branch 'master'
@@ -73,6 +72,7 @@ pipeline {
         }
       }
     }
+   }
   post {
         always {
           cleanWs()
