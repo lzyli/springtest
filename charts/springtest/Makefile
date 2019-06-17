@@ -35,9 +35,11 @@ ifeq ($(OS),Darwin)
 	sed -i "" -e "s/version:.*/version: $(RELEASE_VERSION)/" Chart.yaml
 	sed -i "" -e "s/tag:.*/tag: $(RELEASE_VERSION)/" values.yaml
 else ifeq ($(OS),Linux)
+    DOCKER_REGISTRY="hub.bizweb.vn/fnb-configserver"
+	TAG="fa6d52a-master"
 	sed -i -e "s/version:.*/version: $(RELEASE_VERSION)/" Chart.yaml
-	sed -i -e "s|repository:.*|repository: $(DOCKER_REGISTRY)\/tuananhho\/springtest|" values.yaml
-	sed -i -e "s/tag:.*/tag: $(RELEASE_VERSION)/" values.yaml
+	sed -i -e "s|repository:.*|repository: $(DOCKER_REGISTRY)|" values.yaml
+	sed -i -e "s/tag:.*/tag: $(TAG)/" values.yaml
 else
 	echo "platfrom $(OS) not supported to release from"
 	exit -1
