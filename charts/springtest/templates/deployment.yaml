@@ -1,5 +1,5 @@
-# {{- if .Values.knativeDeploy }}
-# {{- else }}
+{{- if .Values.knativeDeploy }}
+{{- else }}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.sp-repository }}:{{ .Values.image.sp-tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
 {{- range $pkey, $pval := .Values.env }}
