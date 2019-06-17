@@ -1,51 +1,105 @@
-{{- if .Values.knativeDeploy }}
-{{- else }}
+# {{- if .Values.knativeDeploy }}
+# {{- else }}
+# apiVersion: extensions/v1beta1
+# kind: Deployment
+# metadata:
+#   name: jx-spring
+#   labels:
+#     draft: {{ default "draft-app" .Values.draft }}
+#     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+# spec:
+#   replicas: {{ .Values.replicaCount }}
+#   template:
+#     metadata:
+#       labels:
+#         draft: {{ default "draft-app" .Values.draft }}
+#         app: {{ template "fullname" . }}
+# {{- if .Values.podAnnotations }}
+#       annotations:
+# {{ toYaml .Values.podAnnotations | indent 8 }}
+# {{- end }}
+#     spec:
+#       containers:
+#       - name: {{ .Chart.Name }}
+#         image: "{{ .Values.image.sprepository }}:{{ .Values.image.sptag }}"
+#         imagePullPolicy: {{ .Values.image.pullPolicy }}
+#         env:
+# {{- range $pkey, $pval := .Values.env }}
+#         - name: {{ $pkey }}
+#           value: {{ $pval }}
+# {{- end }}
+#         ports:
+#         - containerPort: {{ .Values.service.internalPort }}
+#         livenessProbe:
+#           httpGet:
+#             path: {{ .Values.probePath }}
+#             port: {{ .Values.service.internalPort }}
+#           initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+#           periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+#           successThreshold: {{ .Values.livenessProbe.successThreshold }}
+#           timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+#         readinessProbe:
+#           httpGet:
+#             path: {{ .Values.probePath }}
+#             port: {{ .Values.service.internalPort }}
+#           periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+#           successThreshold: {{ .Values.readinessProbe.successThreshold }}
+#           timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+#         resources:
+# {{ toYaml .Values.resources | indent 12 }}
+#       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+# {{- end }}
+
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: jx-spring
   labels:
-    draft: {{ default "draft-app" .Values.draft }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: configservr
+  name: configserver
 spec:
-  replicas: {{ .Values.replicaCount }}
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: configserver
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
+      creationTimestamp: null
       labels:
-        draft: {{ default "draft-app" .Values.draft }}
-        app: {{ template "fullname" . }}
-{{- if .Values.podAnnotations }}
-      annotations:
-{{ toYaml .Values.podAnnotations | indent 8 }}
-{{- end }}
+        app: configserver
     spec:
       containers:
-      - name: {{ .Chart.Name }}
+      - env:
+        - name: SQL_URL
+          value: sapo-mariadb-prod-rds.cp4o1dqqp6vg.ap-southeast-1.rds.amazonaws.com
+        - name: SQL_USERNAME
+          value: sapo_fnb
+        - name: SQL_PASSWORD
+          value: aA4G7xTBeVE8LUn
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: 10.86.1.79:9092,10.86.1.106:9092,10.86.1.216:9092
+        - name: ZOOKEEPER_CONNECT
+          value: 10.86.1.216,10.86.1.106,10.86.1.79
         image: "{{ .Values.image.sprepository }}:{{ .Values.image.sptag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        env:
-{{- range $pkey, $pval := .Values.env }}
-        - name: {{ $pkey }}
-          value: {{ $pval }}
-{{- end }}
+        imagePullPolicy: IfNotPresent
+        name: configserver
         ports:
-        - containerPort: {{ .Values.service.internalPort }}
-        livenessProbe:
-          httpGet:
-            path: {{ .Values.probePath }}
-            port: {{ .Values.service.internalPort }}
-          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-          successThreshold: {{ .Values.livenessProbe.successThreshold }}
-          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
-        readinessProbe:
-          httpGet:
-            path: {{ .Values.probePath }}
-            port: {{ .Values.service.internalPort }}
-          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-          successThreshold: {{ .Values.readinessProbe.successThreshold }}
-          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
-        resources:
-{{ toYaml .Values.resources | indent 12 }}
-      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
-{{- end }}
+        - containerPort: 8888
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: regcred
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+
