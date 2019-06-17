@@ -27,5 +27,5 @@ profiles:
           # image.repository: '{{.DOCKER_REGISTRY}}/{{.IMAGE_NAME}}'
           # image.tag: '{{.DIGEST_HEX}}'
           image.repository: 'hub.bizweb.vn/fnb-configserver'
-          image.tag: fa6d52a-master
+          image.tag: 'fa6d52a-master'
 
