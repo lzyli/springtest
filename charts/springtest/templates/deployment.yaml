@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.sp-repository }}:{{ .Values.image.sp-tag }}"
+        image: "{{ .Values.image.sprepository }}:{{ .Values.image.sptag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
 {{- range $pkey, $pval := .Values.env }}
