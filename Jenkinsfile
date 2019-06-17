@@ -8,7 +8,7 @@ pipeline {
     CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
     DOCKER_REGISTRY_ORG = 'tuananhho'
   }
-  // stages {
+   stages {
   //   stage('CI Build and push snapshot') {
   //     when {
   //       branch 'PR-*'
@@ -72,7 +72,7 @@ pipeline {
     //       }
     //     }
     //   }
-    // }
+    }
   post {
         always {
           cleanWs()
